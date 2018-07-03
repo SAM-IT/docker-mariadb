@@ -1,0 +1,6 @@
+[mysqld]
+wsrep_provider=/usr/lib/libgalera_smm.so
+binlog_format=row
+default_storage_engine=InnoDB
+wsrep_on=on
+enforce_storage_engine=InnoDB
