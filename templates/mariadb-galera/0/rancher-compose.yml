@@ -1,3 +1,4 @@
+version: '2'
 .catalog:
   name: MariaDB Cluster
   version: v1.0.0
