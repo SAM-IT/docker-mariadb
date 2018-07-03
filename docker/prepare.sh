@@ -1,6 +1,4 @@
 #!/bin/bash
-echo "prepare";
-
 _get_config() {
 	local conf="$1"; shift
 	"$@" --verbose --help --log-bin-index="$(mktemp -u)" 2>/dev/null | awk '$1 == "'"$conf"'" { print $2; exit }'
@@ -20,6 +18,25 @@ mysql=( mysql --protocol=socket -uroot -hlocalhost --socket="/tmp/mysqld.sock" )
 			sleep 1
 		done
 mysql_tzinfo_to_sql /usr/share/zoneinfo | "${mysql[@]}" mysql
+echo ">>> Creating user";
+"${mysql[@]}" <<-EOSQL
+    -- What's done in this file shouldn't be replicated
+    --  or products like mysql-fabric won't work
+    SET @@SESSION.SQL_LOG_BIN=0;
+    CREATE USER IF NOT EXISTS '${USER}'@'${HOST}' IDENTIFIED BY '${PASSWORD}';
+    ALTER USER '${USER}'@'${HOST}' IDENTIFIED BY '${PASSWORD}' ;
+    GRANT ALL ON *.* TO '${USER}'@'${HOST}';
+    FLUSH PRIVILEGES ;
+EOSQL
+
+
+rc=$?; if [ $rc != 0 ]; then exit $rc; fi
+
+"${mysql[@]}" <<-EOSQL
+    SELECT User, Host FROM mysql.user;
+EOSQL
+
+echo "<<< Creating user";
 echo "SHUTDOWN;" | "${mysql[@]}" mysql
 
 if ! wait "$pid"; then

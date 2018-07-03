@@ -7,6 +7,19 @@ version: '2'
   - variable: INNODB_PAGE_SIZE
     label: InnoDB page size
     type: string
+    default: '16K'
+  - variable: HOST
+    label: Authorized host for the user
+    type: string
+    default: '10.42.%'
+  - variable: USER
+    label: Name of the database user
+    type: string
+    default: 'root'
+  - variable: PASSWORD
+    label: Password of the database user
+    type: password
+    required: true
 services:
   mariadb-lb:
     start_on_create: true

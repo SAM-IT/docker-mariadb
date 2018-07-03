@@ -90,7 +90,7 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
         --skip-name-resolve \
         --cross-bootstrap
 
-#        /prepare.sh
+        /prepare.sh || exit $?
 		echo 'Database initialized'
 	fi
 fi
@@ -104,7 +104,7 @@ fi
 _exec_with_address() {
     echo Starting health check service
     giddyup health --check-command healthcheck.sh &
-    CMD="$CMD --wsrep-cluster-address=$1";
+    CMD="tini -- $CMD --wsrep-cluster-address=$1";
     echo Executing $CMD
     exec $CMD
 

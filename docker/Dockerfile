@@ -2,7 +2,7 @@ FROM mariadb
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
-ENTRYPOINT ["/bin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["mysqld"]
 ENV TINI_VERSION v0.18.0
 ENV GIDDYUP_VERSION v0.19.0
