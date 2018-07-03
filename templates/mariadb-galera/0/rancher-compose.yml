@@ -1,0 +1,75 @@
+.catalog:
+  name: MariaDB Cluster
+  version: v1.0.0
+  description: MariaDB Cluster
+  questions:
+  - variable: INNODB_PAGE_SIZE
+    label: InnoDB page size
+    type: string
+services:
+  mariadb-lb:
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - priority: 1
+        protocol: tcp
+        service: mariadb
+        source_port: 3306
+        target_port: 3306
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      reinitializing_timeout: 60000
+  mariadb:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      recreate_on_quorum_strategy_config:
+        quorum: 1
+      port: 1620
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      strategy: recreateOnQuorum
+      request_line: GET "/ping" "HTTP/1.0"
+      reinitializing_timeout: 60000
+  leader-forwarder:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 3307
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      strategy: none
+      reinitializing_timeout: 60000
+  mariadb-data:
+    scale: 1
+    start_on_create: true
+  write-lb:
+    start_on_create: true
+    lb_config:
+      certs: []
+      port_rules:
+      - priority: 1
+        protocol: tcp
+        service: mariadb
+        source_port: 3306
+        target_port: 3307
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      reinitializing_timeout: 60000

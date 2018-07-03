@@ -1,0 +1,37 @@
+version: '2'
+services:
+  mariadb-lb:
+    image: rancher/lb-service-haproxy:v0.9.2
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'
+  write-lb:
+    image: rancher/lb-service-haproxy:v0.9.2
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'
+  mariadb:
+    image: collecthor/mariadb:latest
+    environment:
+      INNODB_PAGE_SIZE: ${INNODB_PAGE_SIZE}
+    volumes_from:
+      - mariadb-data
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+      io.rancher.sidekicks: mariadb-data, leader-forwarder
+  mariadb-data:
+    image: alpine
+    network_mode: none
+    volumes:
+    - /var/lib/mysql
+    command: /bin/true
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.container.start_once: 'true'
+  leader-forwarder:
+    image: awesam/rancher-leader-forwarder
+    command: --dst-port 3306 --src-port 3307
+    network_mode: container:mariadb
