@@ -1,8 +1,8 @@
 FROM mariadb
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+#RUN apt-get update \
+#    && apt-get install -y --no-install-recommends curl \
+#    && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["mysqld"]
 ENV TINI_VERSION v0.18.0
 ENV GIDDYUP_VERSION v0.19.0
@@ -16,7 +16,7 @@ RUN gpg --verify /bin/tini.asc \
  && rm -rf /root/.gnupg \
  && chmod +x /bin/tini \
  && chmod +x /bin/giddyup
-COPY docker-entrypoint.sh /usr/local/bin/
-COPY prepare.sh /prepare.sh
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY prepare-database.sh /usr/local/bin/prepare-database
 COPY conf.d /etc/mysql/conf.d
 COPY healthcheck.sh /usr/local/bin/healthcheck.sh

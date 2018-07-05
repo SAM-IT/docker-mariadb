@@ -90,7 +90,7 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
         --skip-name-resolve \
         --cross-bootstrap
 
-        /prepare.sh || exit $?
+        prepare-database || exit $?
 		echo 'Database initialized'
 	fi
 fi

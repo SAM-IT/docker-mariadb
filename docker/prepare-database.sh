@@ -8,7 +8,7 @@ _get_config() {
 
 mysqld --no-defaults --user=mysql --innodb-page-size=$INNODB_PAGE_SIZE --skip-networking --socket=/tmp/mysqld.sock --datadir=$DATADIR &
 pid="$!"
-mysql=( mysql --protocol=socket -uroot -hlocalhost --socket="/tmp/mysqld.sock" )
+mysql=( mysql --protocol=socket -uroot -hlocalhost --socket="/tmp/mysqld.sock")
 
 		for i in {30..0}; do
 			if echo 'SELECT 1' | "${mysql[@]}" &> /dev/null; then
@@ -19,6 +19,11 @@ mysql=( mysql --protocol=socket -uroot -hlocalhost --socket="/tmp/mysqld.sock" )
 		done
 mysql_tzinfo_to_sql /usr/share/zoneinfo | "${mysql[@]}" mysql
 echo ">>> Creating user";
+if [[ ! -z "$USER" ]] && [[ ! -z "$PASSWORD" ]]; then
+
+if [[ -z "$HOST" ]]; then
+  HOST=localhost
+fi
 "${mysql[@]}" <<-EOSQL
     -- What's done in this file shouldn't be replicated
     --  or products like mysql-fabric won't work
@@ -31,12 +36,23 @@ EOSQL
 
 
 rc=$?; if [ $rc != 0 ]; then exit $rc; fi
+echo "Creating exited with code: $rc"
 
-"${mysql[@]}" <<-EOSQL
-    SELECT User, Host FROM mysql.user;
+SQL=$(cat <<-EOSQL
+    SELECT User, Host FROM mysql.user where User = '${USER}' and Host = '${HOST}';
 EOSQL
+)
+echo "Executing SQL: $SQL"
+"${mysql[@]}" -e "$SQL"
+
+
+else
+  echo "Skip user creating, user or password are empty"
+fi
+
 
 echo "<<< Creating user";
+
 echo "SHUTDOWN;" | "${mysql[@]}" mysql
 
 if ! wait "$pid"; then
