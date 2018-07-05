@@ -16,6 +16,9 @@ services:
     image: awesam/mariadb:v1.0.0
     environment:
       INNODB_PAGE_SIZE: ${INNODB_PAGE_SIZE}
+      HOST: ${HOST}
+      USER: ${USER}
+      PASSWORD: ${PASSWORD}
     volumes_from:
       - mariadb-data
     labels:
