@@ -15,7 +15,9 @@ RUN gpg --verify /bin/tini.asc \
  && rm /bin/tini.asc \
  && rm -rf /root/.gnupg \
  && chmod +x /bin/tini \
- && chmod +x /bin/giddyup
+ && chmod +x /bin/giddyup \
+ && rm /docker-entrypoint.sh \
+ && rm /usr/local/bin/docker-entrypoint.sh
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY prepare-database.sh /usr/local/bin/prepare-database
 COPY conf.d /etc/mysql/conf.d
