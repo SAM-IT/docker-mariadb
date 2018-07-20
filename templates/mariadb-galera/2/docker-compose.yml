@@ -23,7 +23,7 @@ services:
       S3_URI: ${S3_URI}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
-      DISABLED: ${DISABLE_BACKUP}
+      DISABLE_BACKUP: ${DISABLE_BACKUP}
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.start_once: ${DISABLE_BACKUP}
