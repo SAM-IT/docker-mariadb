@@ -29,7 +29,7 @@ version: '2'
     label: Backup names
     type: string
     required: false
-    description: Please refer to the mysqldump documentation for details. Basic options include: --all-databases (-A), --databases (-B) DB1 DB2 and in case you want specific tables in one database use: DB1 TABLE1 TABLE2
+    description: Please refer to the mysqldump documentation for details
     default: --all-databases
   - variable: S3_ACCESS_KEY
     label: S3 Access Key
