@@ -13,11 +13,11 @@ do
     echo "Starting backup"  | ts '[%Y-%m-%d %H:%M:%S]';
     backup=$(date -u +"%Y%m%dT%H%M%S").gpg
 
-    mysqldump -h $DBHOST -p$DBPASS -u $DBUSER $DBNAME | gpg --cipher-algo AES256 --compress-level 9 --always-trust $recipients --encrypt --output $backup  | ts '[%Y-%m-%d %H:%M:%S]'
+    mysqldump -h $DB_HOST -p$DB_PASS -u $DB_USER --all-databases | gpg --cipher-algo AES256 --compress-level 9 --always-trust $recipients --encrypt --output $backup  | ts '[%Y-%m-%d %H:%M:%S]'
     echo "Backup file created" | ts '[%Y-%m-%d %H:%M:%S]'
     ls -lah $backup | ts '[%Y-%m-%d %H:%M:%S]'
-    s3cmd --host-bucket "%(bucket)s.ams3.digitaloceanspaces.com" \
-      --host ams3.digitaloceanspaces.com \
+    s3cmd --host-bucket "%(bucket)s.$S3_ENDPOINT" \
+      --host $S3_ENDPOINT \
       --access_key=$S3_ACCESS_KEY \
       --secret_key=$S3_SECRET_KEY \
       --acl-private \

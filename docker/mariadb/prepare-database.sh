@@ -25,8 +25,6 @@ if [[ -z "$HOST" ]]; then
   HOST=localhost
 fi
 "${mysql[@]}" <<-EOSQL
-    -- What's done in this file shouldn't be replicated
-    --  or products like mysql-fabric won't work
     SET @@SESSION.SQL_LOG_BIN=0;
     CREATE USER IF NOT EXISTS '${USER}'@'${HOST}' IDENTIFIED BY '${PASSWORD}';
     ALTER USER '${USER}'@'${HOST}' IDENTIFIED BY '${PASSWORD}' ;
