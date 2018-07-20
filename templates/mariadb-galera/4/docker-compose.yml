@@ -26,6 +26,7 @@ services:
       DISABLE_BACKUP: ${DISABLE_BACKUP}
       PK_PRIMARY: ${PK_PRIMARY}
       PK_SECONDARY: ${PK_SECONDARY}
+      BACKUP_NAMES: ${BACKUP_NAMES}
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.start_once: ${DISABLE_BACKUP}
