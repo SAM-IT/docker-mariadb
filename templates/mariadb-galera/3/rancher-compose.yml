@@ -1,0 +1,128 @@
+version: '2'
+.catalog:
+  name: MariaDB Cluster
+  version: v2.1.0-2
+  description: MariaDB Cluster
+  questions:
+  - variable: INNODB_PAGE_SIZE
+    label: InnoDB page size
+    type: string
+    default: '16K'
+  - variable: HOST
+    label: Authorized host for the user
+    type: string
+    default: '10.42.%'
+  - variable: USER
+    label: Name of the database user
+    type: string
+    default: 'root'
+  - variable: PASSWORD
+    label: Password of the database user
+    type: password
+    required: true
+  - variable: DISABLE_BACKUP
+    label: Disable backups
+    type: boolean
+    required: true
+    description: Checking this will mark the backup container as `start once`
+  - variable: S3_ACCESS_KEY
+    label: S3 Access Key
+    type: string
+    required: false
+    description: Only needed when backups are enabled
+  - variable: S3_SECRET_KEY
+    label: S3 Secret Key
+    type: string
+    required: false
+    description: Only needed when backups are enabled
+  - variable: PK_PRIMARY
+    label: Public key of primary backup recipient
+    type: multiline
+    required: false
+    description: Backups are encrypted for specific recipients (using gpg)
+  - variable: PK_SECONDARY
+    label: Public key of primary backup recipient
+    type: multiline
+    required: false
+    description: Backups are encrypted for specific recipients (using gpg)
+  - variable: S3_URI
+    label: S3 URI (starts with s3://)
+    type: string
+    required: false
+    description: Only needed when backups are enabled
+  - variable: S3_ENDPOINT
+    label: S3 Endpoint
+    type: string
+    required: false
+    default: ams3.digitaloceanspaces.com
+    description: Only needed when backups are enabled
+  - variable: INTERVAL
+    label: Backup interval (seconds)
+    type: int
+    default: 3600
+    required: false
+    description: Only needed when backups are enabled
+services:
+  backup:
+    scale: 1
+  mariadb-lb:
+    lb_config:
+      certs: []
+      port_rules:
+      - priority: 1
+        protocol: tcp
+        service: mariadb
+        source_port: 3306
+        target_port: 3306
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      reinitializing_timeout: 60000
+  mariadb:
+    scale: 1
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      recreate_on_quorum_strategy_config:
+        quorum: 1
+      port: 1620
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      strategy: recreateOnQuorum
+      request_line: GET "/ping" "HTTP/1.0"
+      reinitializing_timeout: 60000
+  leader-forwarder:
+    scale: 1
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 3307
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      strategy: none
+      reinitializing_timeout: 60000
+  mariadb-data:
+    scale: 1
+  write-lb:
+    lb_config:
+      certs: []
+      port_rules:
+      - priority: 1
+        protocol: tcp
+        service: mariadb
+        source_port: 3306
+        target_port: 3307
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 42
+      unhealthy_threshold: 3
+      initializing_timeout: 60000
+      interval: 2000
+      reinitializing_timeout: 60000
