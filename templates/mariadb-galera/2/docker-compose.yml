@@ -13,7 +13,7 @@ services:
       io.rancher.container.create_agent: 'true'
       io.rancher.scheduler.global: 'true'
   backup:
-    image: awesam/s3-backup
+    image: awesam/s3-backup:v2.1.0
     environment:
       DB_HOST: mariadb-lb
       DB_PASS: ${PASSWORD}
@@ -28,7 +28,7 @@ services:
       io.rancher.container.pull_image: always
       io.rancher.container.start_once: ${DISABLE_BACKUP}
   mariadb:
-    image: awesam/mariadb:v1.0.2
+    image: awesam/mariadb:v2.1.0
     environment:
       INNODB_PAGE_SIZE: ${INNODB_PAGE_SIZE}
       HOST: ${HOST}

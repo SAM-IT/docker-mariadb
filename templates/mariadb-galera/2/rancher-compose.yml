@@ -1,7 +1,7 @@
 version: '2'
 .catalog:
   name: MariaDB Cluster
-  version: v2.0.0
+  version: v2.1.0
   description: MariaDB Cluster
   questions:
   - variable: INNODB_PAGE_SIZE
