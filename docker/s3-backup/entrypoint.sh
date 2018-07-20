@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$DISABLE_BACKUP" = "true" ]; then
+  echo "Backups disabled, sleeping for 60 seconds then exiting...";
+  sleep 60;
+  exit 0;
+fi
 mkdir /tmp/keys
 echo "Extracting environment variables starting with PK_..."  | ts '[%Y-%m-%d %H:%M:%S]'
 env | awk -F"=" '{print $1}' | grep "^PK_" | xargs -I '{}' sh -c 'echo "${}" > /tmp/keys/{}.key'
